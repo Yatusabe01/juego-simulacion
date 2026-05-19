@@ -1,0 +1,50 @@
+[
+  {
+    "iniciales": "DAS",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 2165,
+    "fecha": "2026-05-18 23:56"
+  },
+  {
+    "iniciales": "ASD",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 290,
+    "fecha": "2026-05-18 23:51"
+  },
+  {
+    "iniciales": "ASD",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 185,
+    "fecha": "2026-05-18 23:53"
+  },
+  {
+    "iniciales": "SEB",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "victoria_j1",
+    "puntaje": 85,
+    "fecha": "2026-05-19 00:08"
+  },
+  {
+    "iniciales": "DSA",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "victoria_j1",
+    "puntaje": 65,
+    "fecha": "2026-05-19 00:10"
+  },
+  {
+    "iniciales": "ELF",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "victoria_j1",
+    "puntaje": 65,
+    "fecha": "2026-05-19 00:08"
+  }
+]
