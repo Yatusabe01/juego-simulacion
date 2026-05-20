@@ -48,6 +48,15 @@ Juego arcade en `pygame` donde una nave esquiva y destruye meteoritos.
 - `pygame.Rect(x, y, ancho, alto)` usa siempre coordenadas y tamaños en píxeles.
 - Los valores como `dt` son de tiempo en segundos, no en píxeles.
 
+## Distribucion
+
+- Los meteoritos se generan con una espera base por dificultad y una variacion uniforme.
+- La formula usada es: `espero = base * U(0.75, 1.25)`.
+- `U(a, b)` representa una distribucion uniforme en el rango `[a, b]`.
+- La altura de spawn tambien usa distribucion uniforme para repartir meteoritos en pantalla.
+- El radio, la cantidad de vertices y la deriva vertical se toman con valores uniformes dentro de rangos definidos.
+- En modo infinito e imposible se modifica la frecuencia de spawn con factores multiplicativos para aumentar la dificultad.
+
 ## Uso
 
 - `WASD` o flechas: mover nave.
