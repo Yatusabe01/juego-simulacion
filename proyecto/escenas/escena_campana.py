@@ -20,7 +20,7 @@ class EscenaCampana:
     def __init__(self, entrada, dificultad: str = "medio", iniciales: str = "AAA") -> None:
         self.entrada = entrada
         self.niveles = ["facil", "medio", "dificil"]
-        self.indice_nivel = self.niveles.index(dificultad)
+        self.indice_nivel = self.niveles.index(dificultad) if dificultad in self.niveles else 0
         self.iniciales = (iniciales or "AAA")[:3].upper()
         self.fuente_titulo = cargar_fuente(TAMANO_TITULO)
         self.fuente_subtitulo = cargar_fuente(TAMANO_SUBTITULO)
@@ -43,9 +43,12 @@ class EscenaCampana:
         self.dificultad_extra = 0
 
     def _inicializar_nivel(self) -> None:
+        puntaje_acumulado = getattr(self, "nave", None)
+        puntaje_acumulado = puntaje_acumulado.puntaje if puntaje_acumulado else 0
         nivel = self.niveles[self.indice_nivel]
         self.nivel_actual = nivel
         self.nave = Nave(1, COLORES["primario"], 0, ALTO)
+        self.nave.puntaje = puntaje_acumulado
         self.balas: list[Bala] = []
         self.meteoritos: list[Meteorito] = []
         self.explosiones: list[Explosion] = []
@@ -266,24 +269,25 @@ class EscenaCampana:
             explosion.renderizar(pantalla)
         self.nave.renderizar(pantalla)
 
-        panel_opciones = pygame.Rect(ANCHO - ANCHO_BOTON_OPCIONES - MARGEN_GENERAL, MARGEN_GENERAL, ANCHO_BOTON_OPCIONES, ALTO_BOTON_OPCIONES)
+        panel_opciones = pygame.Rect(ANCHO - 160 - MARGEN_GENERAL, MARGEN_GENERAL, 160, ALTO_BOTON_OPCIONES)
         dibujar_boton_pequeno(pantalla, panel_opciones, "OPCIONES", self.fuente_pequena, False)
 
         titulo_nivel = "MODO INFINITO" if self.modo_infinito else f"NIVEL {self.indice_nivel + 1}/3 - {self.nivel_actual.upper()}"
-        dibujar_texto_ajustado(pantalla, titulo_nivel, 14, COLORES["neutro_claro"], (ANCHO // 2, MARGEN_GENERAL + 10), ANCHO - 180)
+        dibujar_texto_ajustado(pantalla, titulo_nivel, 14, COLORES["neutro_claro"], (ANCHO // 2, MARGEN_GENERAL + 8), ANCHO - 180)
         if self.modo_infinito:
             dibujar_texto_ajustado(
                 pantalla,
                 f"DESTRUIR +{PUNTOS_DESTRUIR} | ESQUIVAR +{PUNTOS_ESQUIVAR}",
                 10,
                 COLORES["acento"],
-                (ANCHO // 2, MARGEN_GENERAL + 40),
+                (ANCHO // 2, MARGEN_GENERAL + 34),
                 ANCHO - 180,
             )
-            dibujar_texto_ajustado(pantalla, f"DIFICULTAD {self.dificultad_extra}", 10, COLORES["neutro_claro"], (ANCHO // 2, MARGEN_GENERAL + 56), ANCHO - 180)
+            dibujar_texto_ajustado(pantalla, f"DIFICULTAD {self.dificultad_extra}", 10, COLORES["neutro_claro"], (ANCHO // 2, MARGEN_GENERAL + 50), ANCHO - 180)
+            dibujar_texto_ajustado(pantalla, f"OBJETIVO {self.modo_accion.upper()}", 11, COLORES["secundario"] if self.modo_accion == "destruir" else COLORES["primario"], (ANCHO // 2, MARGEN_GENERAL + 80), ANCHO - 180)
         else:
             dibujar_texto_ajustado(pantalla, f"PROGRESO {self.meteoritos_generados}/15", 14, COLORES["acento"], (ANCHO // 2, MARGEN_GENERAL + 32), ANCHO - 180)
-        dibujar_texto_ajustado(pantalla, f"OBJETIVO {self.modo_accion.upper()}", 11, COLORES["secundario"] if self.modo_accion == "destruir" else COLORES["primario"], (ANCHO // 2, MARGEN_GENERAL + 68), ANCHO - 180)
+            dibujar_texto_ajustado(pantalla, f"OBJETIVO {self.modo_accion.upper()}", 11, COLORES["secundario"] if self.modo_accion == "destruir" else COLORES["primario"], (ANCHO // 2, MARGEN_GENERAL + 58), ANCHO - 180)
 
         dibujar_texto(pantalla, f"SCORE {formatear_puntaje(self.nave.puntaje)}", self.fuente_normal, COLORES["blanco"], (MARGEN_GENERAL, MARGEN_GENERAL + 2))
         mini = crear_miniatura_nave(COLORES["primario"])

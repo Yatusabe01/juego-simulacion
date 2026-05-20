@@ -1,0 +1,50 @@
+[
+  {
+    "iniciales": "DAS",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 770,
+    "fecha": "2026-05-19 21:48"
+  },
+  {
+    "iniciales": "DAS",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "empate",
+    "puntaje": 60,
+    "fecha": "2026-05-19 00:30"
+  },
+  {
+    "iniciales": "DSA",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "empate",
+    "puntaje": 45,
+    "fecha": "2026-05-19 21:40"
+  },
+  {
+    "iniciales": "DAS",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "empate",
+    "puntaje": 45,
+    "fecha": "2026-05-19 21:40"
+  },
+  {
+    "iniciales": "ASD",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 20,
+    "fecha": "2026-05-19 18:55"
+  },
+  {
+    "iniciales": "ASD",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "empate",
+    "puntaje": 15,
+    "fecha": "2026-05-19 18:56"
+  }
+]

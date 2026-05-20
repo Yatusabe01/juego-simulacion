@@ -209,7 +209,7 @@ class EscenaVs:
         self._dibujar_mundo(vista_j1, 0, self.nave_j1, self.balas_j1, self.meteoritos_j1, self.explosiones_j1, "JUGADOR 1", COLORES["primario"])
         self._dibujar_mundo(vista_j2, ALTO_VISTA_VS, self.nave_j2, self.balas_j2, self.meteoritos_j2, self.explosiones_j2, "JUGADOR 2", COLORES["secundario"])
         pygame.draw.rect(pantalla, COLORES["neutro_oscuro"], pygame.Rect(0, ALTO_VISTA_VS - 1, ANCHO, ANCHO_DIVISORIA_VS))
-        panel_opciones = pygame.Rect(ANCHO - ANCHO_BOTON_OPCIONES - MARGEN_GENERAL, MARGEN_GENERAL, ANCHO_BOTON_OPCIONES, ALTO_BOTON_OPCIONES)
+        panel_opciones = pygame.Rect(ANCHO - 180 - MARGEN_GENERAL, MARGEN_GENERAL, 180, ALTO_BOTON_OPCIONES)
         dibujar_boton_pequeno(pantalla, panel_opciones, "ESC OPCIONES", self.fuente_pequena, False)
 
         if self.modo_pausa:

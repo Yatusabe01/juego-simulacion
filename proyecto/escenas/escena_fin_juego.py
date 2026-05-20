@@ -47,7 +47,8 @@ class EscenaFinJuego:
         if self.entrada.recien_presionada(pygame.K_RETURN):
             if self.seleccion == 0:
                 if self.modo == "campana":
-                    return ("escena_iniciales", {"modo": "campana", "dificultad": self.dificultad, "cantidad_jugadores": 1})
+                    dificultad_segura = self.dificultad if self.dificultad in ["facil", "medio", "dificil"] else "facil"
+                    return ("escena_iniciales", {"modo": "campana", "dificultad": dificultad_segura, "cantidad_jugadores": 1})
                 return ("escena_iniciales", {"modo": "vs", "cantidad_jugadores": 2})
             return ("escena_menu", {})
         return None
