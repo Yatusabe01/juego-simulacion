@@ -8,10 +8,15 @@ import pygame
 
 from configuracion import (
     COLORES,
+    ESTRELLAS_POR_CAPA,
     FUENTE_FALLBACK,
     RUTA_FUENTE_RETRO,
     RUTA_SPRITE_NAVE,
+    VELOCIDAD_ESTRELLAS,
+    ANCHO,
+    ALTO,
 )
+from matematicas.probabilidad import entero_uniforme, muestra_uniforme
 
 RUTA_AUDIO = os.path.join(os.path.dirname(RUTA_SPRITE_NAVE), "audio")
 _SONIDOS: dict[str, pygame.mixer.Sound] = {}
@@ -81,6 +86,39 @@ def reproducir_sonido(nombre_base: str) -> None:
         else:
             sonido.set_volume(1.0)
         return sonido.play()
+
+
+def crear_estrellas() -> list[dict[str, float | int]]:
+    estrellas: list[dict[str, float | int]] = []
+    for indice, cantidad in enumerate(ESTRELLAS_POR_CAPA):
+        for _ in range(cantidad):
+            estrellas.append({
+                "x": muestra_uniforme(0, ANCHO),
+                "y": muestra_uniforme(0, ALTO),
+                "tamano": entero_uniforme(1, 2),
+                "velocidad": VELOCIDAD_ESTRELLAS[indice],
+            })
+    return estrellas
+
+
+def actualizar_estrellas(estrellas: list[dict[str, float | int]], dt: float) -> None:
+    for estrella in estrellas:
+        estrella["x"] = float(estrella["x"]) - float(estrella["velocidad"]) * dt
+        if float(estrella["x"]) < 0:
+            estrella["x"] = ANCHO + muestra_uniforme(0, 40)
+            estrella["y"] = muestra_uniforme(0, ALTO)
+            estrella["tamano"] = entero_uniforme(1, 2)
+
+
+def dibujar_estrellas(pantalla: pygame.Surface, estrellas: list[dict[str, float | int]], desplazamiento_y: int = 0, altura_visible: int | None = None) -> None:
+    alto = altura_visible if altura_visible is not None else pantalla.get_height()
+    for estrella in estrellas:
+        y = int(estrella["y"])
+        if desplazamiento_y and not (desplazamiento_y <= y < desplazamiento_y + alto):
+            continue
+        tamano = int(estrella["tamano"])
+        brillo = COLORES["blanco"] if tamano == 2 else COLORES["neutro_claro"]
+        pygame.draw.rect(pantalla, brillo, pygame.Rect(int(estrella["x"]), y - desplazamiento_y, tamano, tamano))
 
 
 def reproducir_musica(nombre_base: str, volumen: float = 0.7) -> None:

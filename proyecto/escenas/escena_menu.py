@@ -4,9 +4,8 @@ from __future__ import annotations
 
 import pygame
 
-from configuracion import ANCHO, ALTO, COLORES, ESTRELLAS, ESTRELLAS_POR_CAPA, FPS, PARPADEO_TITULO, TAMANO_BOTON_MENU, TAMANO_TITULO, TAMANO_SUBTITULO, VELOCIDAD_ESTRELLAS, MARGEN_GENERAL
-from matematicas.probabilidad import entero_uniforme, muestra_uniforme
-from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, dibujar_boton, dibujar_texto_ajustado, reproducir_musica
+from configuracion import ANCHO, ALTO, COLORES, PARPADEO_TITULO, TAMANO_BOTON_MENU, TAMANO_TITULO, TAMANO_SUBTITULO, MARGEN_GENERAL
+from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, dibujar_boton, dibujar_estrellas, dibujar_texto_ajustado, reproducir_musica, crear_estrellas, actualizar_estrellas
 
 
 class EscenaMenu:
@@ -18,32 +17,15 @@ class EscenaMenu:
         self.fuente_subtitulo = cargar_fuente(TAMANO_SUBTITULO)
         self.seleccion = 0
         self.tiempo_parpadeo = 0.0
-        self.estrellas = self._crear_estrellas()
+        self.estrellas = crear_estrellas()
         reproducir_musica("musica_menu", 0.55)
-
-    def _crear_estrellas(self) -> list[dict[str, float | int]]:
-        estrellas: list[dict[str, float | int]] = []
-        for indice, cantidad in enumerate(ESTRELLAS_POR_CAPA):
-            for _ in range(cantidad):
-                estrellas.append({
-                    "x": muestra_uniforme(0, ANCHO),
-                    "y": muestra_uniforme(0, ALTO),
-                    "tamano": entero_uniforme(1, 2),
-                    "velocidad": VELOCIDAD_ESTRELLAS[indice],
-                })
-        return estrellas
 
     def manejar_escape(self):
         return "salir"
 
     def actualizar(self, dt: float):
         self.tiempo_parpadeo += dt
-        for estrella in self.estrellas:
-            estrella["x"] = float(estrella["x"]) - float(estrella["velocidad"]) * dt
-            if float(estrella["x"]) < 0:
-                estrella["x"] = ANCHO + muestra_uniforme(0, 40)
-                estrella["y"] = muestra_uniforme(0, ALTO)
-                estrella["tamano"] = entero_uniforme(1, 2)
+        actualizar_estrellas(self.estrellas, dt)
 
         if self.entrada.recien_presionada(pygame.K_LEFT):
             self.seleccion = max(0, self.seleccion - 1)
@@ -59,10 +41,7 @@ class EscenaMenu:
 
     def renderizar(self, pantalla: pygame.Surface) -> None:
         pantalla.fill(COLORES["fondo"])
-        for estrella in self.estrellas:
-            tamano = int(estrella["tamano"])
-            brillo = COLORES["blanco"] if tamano == 2 else COLORES["neutro_claro"]
-            pygame.draw.rect(pantalla, brillo, pygame.Rect(int(estrella["x"]), int(estrella["y"]), tamano, tamano))
+        dibujar_estrellas(pantalla, self.estrellas)
 
         sombra_x = 2
         sombra_y = 2

@@ -5,13 +5,12 @@ import math
 
 import pygame
 
-from configuracion import ALTO, ANCHO, COLORES, ESTRELLAS_POR_CAPA, PUNTOS_DESTRUIR, PUNTOS_ESQUIVAR, TAMANO_SUBTITULO, TAMANO_NORMAL, TAMANO_PEQUENO, TAMANO_TITULO, ANCHO_BOTON_OPCIONES, ALTO_BOTON_OPCIONES, MARGEN_GENERAL, ANCHO_MODAL_OPCIONES, ALTO_MODAL_OPCIONES, ALPHA_OVERLAY, SLIDER_ANCHO, SLIDER_ALTO, TAMANO_MANGO_SLIDER, ANCHO_BOTON_MODAL, ALTO_BOTON_MODAL, VELOCIDAD_ESTRELLAS
+from configuracion import ALTO, ANCHO, COLORES, PUNTOS_DESTRUIR, PUNTOS_ESQUIVAR, TAMANO_SUBTITULO, TAMANO_NORMAL, TAMANO_PEQUENO, TAMANO_TITULO, ANCHO_BOTON_OPCIONES, ALTO_BOTON_OPCIONES, MARGEN_GENERAL, ANCHO_MODAL_OPCIONES, ALTO_MODAL_OPCIONES, ALPHA_OVERLAY, SLIDER_ANCHO, SLIDER_ALTO, TAMANO_MANGO_SLIDER, ANCHO_BOTON_MODAL, ALTO_BOTON_MODAL
 from entidades.bala import Bala
 from entidades.explosion import Explosion
 from entidades.meteorito import Meteorito
 from entidades.nave import Nave
-from matematicas.probabilidad import entero_uniforme, muestra_uniforme
-from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, crear_miniatura_nave, dibujar_boton_pequeno, dibujar_texto, dibujar_texto_ajustado, detener_musica, reproducir_musica, reproducir_sonido
+from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, crear_estrellas, crear_miniatura_nave, dibujar_boton_pequeno, dibujar_estrellas, dibujar_texto, dibujar_texto_ajustado, detener_musica, reproducir_musica, reproducir_sonido, actualizar_estrellas
 from nucleo.generador_oleada import GeneradorOleada
 from nucleo.manejador_colisiones import hay_colision
 from nucleo.manejador_puntaje import formatear_puntaje, sumar_por_destruccion, sumar_por_esquivar
@@ -49,21 +48,9 @@ class EscenaCampana:
         self.meteoritos_generados = 0
         self.umbral_dificultad = 10000
         self.dificultad_extra = 0
-        self.estrellas = self._crear_estrellas()
+        self.estrellas = crear_estrellas()
         self.tiempo_parpadeo = 0.0
         reproducir_musica("musica_campana", 0.55)
-
-    def _crear_estrellas(self) -> list[dict[str, float | int]]:
-        estrellas: list[dict[str, float | int]] = []
-        for indice, cantidad in enumerate(ESTRELLAS_POR_CAPA):
-            for _ in range(cantidad):
-                estrellas.append({
-                    "x": muestra_uniforme(0, ANCHO),
-                    "y": muestra_uniforme(0, ALTO),
-                    "tamano": entero_uniforme(1, 2),
-                    "velocidad": VELOCIDAD_ESTRELLAS[indice],
-                })
-        return estrellas
 
     def _inicializar_nivel(self) -> None:
         puntaje_acumulado = getattr(self, "nave", None)
@@ -240,12 +227,7 @@ class EscenaCampana:
             return self._actualizar_opciones()
 
         self.tiempo_parpadeo += dt
-        for estrella in self.estrellas:
-            estrella["x"] = float(estrella["x"]) - float(estrella["velocidad"]) * dt
-            if float(estrella["x"]) < 0:
-                estrella["x"] = ANCHO + muestra_uniforme(0, 40)
-                estrella["y"] = muestra_uniforme(0, ALTO)
-                estrella["tamano"] = entero_uniforme(1, 2)
+        actualizar_estrellas(self.estrellas, dt)
 
         for dato in self.generador.actualizar(dt):
             self.meteoritos.append(self._crear_meteorito(dato))
@@ -344,10 +326,7 @@ class EscenaCampana:
 
     def renderizar(self, pantalla: pygame.Surface) -> None:
         pantalla.fill(COLORES["fondo"])
-        for estrella in self.estrellas:
-            tamano = int(estrella["tamano"])
-            brillo = COLORES["blanco"] if tamano == 2 else COLORES["neutro_claro"]
-            pygame.draw.rect(pantalla, brillo, pygame.Rect(int(estrella["x"]), int(estrella["y"]), tamano, tamano))
+        dibujar_estrellas(pantalla, self.estrellas)
         for meteorito in self.meteoritos:
             meteorito.renderizar(pantalla)
         for bala in self.balas:

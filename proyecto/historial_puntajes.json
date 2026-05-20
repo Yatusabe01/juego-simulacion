@@ -1,5 +1,13 @@
 [
   {
+    "iniciales": "SDD",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 280,
+    "fecha": "2026-05-19 23:29"
+  },
+  {
     "iniciales": "IVT",
     "modo": "campana",
     "categoria": "campana",
@@ -38,13 +46,5 @@
     "resultado": "victoria_j2",
     "puntaje": 20,
     "fecha": "2026-05-19 18:43"
-  },
-  {
-    "iniciales": "IVT",
-    "modo": "vs",
-    "categoria": "vs",
-    "resultado": "victoria_j1",
-    "puntaje": 15,
-    "fecha": "2026-05-19 19:02"
   }
 ]
