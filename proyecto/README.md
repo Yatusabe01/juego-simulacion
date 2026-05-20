@@ -2,18 +2,52 @@
 
 Juego arcade en `pygame` donde una nave esquiva y destruye meteoritos.
 
-## Modos
+## Arquitectura
 
-- `Campaña`: 3 dificultades y luego modo infinito.
-- `VS`: dos jugadores en pantallas separadas.
-- `VS infinito`: variante con spawn más agresivo.
+- `principal.py`: inicia `pygame` y ejecuta el bucle principal.
+- `nucleo/bucle_juego.py`: administra eventos, cambio de escenas, `dt` y render final.
+- `nucleo/manejador_entrada.py`: captura teclas, mouse y pulsaciones recientes.
+- `nucleo/ayudantes.py`: centraliza UI, fuentes, audio, estrellas y utilidades visuales.
+- `entidades/`: contiene la lógica de objetos del juego.
+- `escenas/`: implementa cada pantalla o estado del flujo.
 
-## Controles
+## Flujo
 
-- `WASD` / `Flechas`: mover nave.
-- `SPACE` / `.`: disparar.
-- `ESC`: abrir/cerrar pausa o volver al menú.
+- El juego comienza en `EscenaMenu`.
+- Cada escena implementa `actualizar(dt)` y `renderizar(pantalla)`.
+- `actualizar(dt)` devuelve `None`, un nombre de escena, o una tupla `(escena, datos)`.
+- `bucle_juego.py` recibe esa transición y construye la siguiente escena.
+- El estado visual y lógico se separa por escena para mantener el código modular.
+
+## Responsabilidades
+
+- `EscenaMenu`: menú, estrellas, navegación a campaña/VS/info.
+- `EscenaDificultad`: selección de dificultad para campaña.
+- `EscenaSelectorVs`: selección de VS clásico, imposible o infinito.
+- `EscenaIniciales`: captura de iniciales por jugador.
+- `EscenaCampana`: niveles, progresión, HUD, fin de campaña e infinito.
+- `EscenaVs`: dos arenas sincronizadas con colisiones separadas.
+- `EscenaFinJuego`: resultado final, reintento y retorno al menú.
+
+## Sintaxis Usada
+
+- `Clases`: cada pantalla y entidad está modelada con `class`.
+- `Métodos`: la lógica se divide en funciones cortas como `actualizar`, `renderizar` y `_resolver_colisiones`.
+- `Listas y diccionarios`: se usan para meteoritos, estrellas, datos de escena e historial.
+- `Type hints`: se usa anotación como `list[Bala]`, `dict[str, object]`, `str | None`.
+- `Match implícito`: la selección de escena se hace con `if`/`elif` en `bucle_juego.py`.
+- `Guard clauses`: se usan retornos tempranos para pausa, confirmación y estados especiales.
+- `pygame.Rect`: se usa para colisiones, botones y layout.
+- `pygame.mixer`: se usa para música en loop y efectos por evento.
+
+## Uso
+
+- `WASD` o flechas: mover nave.
+- `SPACE` o `.`: disparar.
+- `ENTER`: confirmar y continuar.
+- `ESC`: pausar, volver o salir.
 - `F11`: pantalla completa.
+- `SIM` o `ELF` en iniciales de VS: activa el modo especial.
 
 ## Audio
 
