@@ -4,9 +4,9 @@ from __future__ import annotations
 
 import pygame
 
-from configuracion import ALTO, ANCHO, COLORES, TAMANO_NORMAL, TAMANO_SUBTITULO, TAMANO_TITULO
+from configuracion import ANCHO, COLORES, TAMANO_NORMAL, TAMANO_SUBTITULO, TAMANO_TITULO
 from nucleo.historial_puntajes import agregar_registro
-from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, dibujar_boton
+from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, dibujar_boton, detener_musica, reproducir_sonido
 
 
 class EscenaFinJuego:
@@ -27,24 +27,41 @@ class EscenaFinJuego:
         self.fuente_subtitulo = cargar_fuente(TAMANO_SUBTITULO)
         self.fuente_normal = cargar_fuente(TAMANO_NORMAL)
         self.seleccion = 0
+        detener_musica()
+        self.canal_resultado = None
         if self.modo == "campana" and self.puntaje is not None:
             agregar_registro(self.iniciales[:3], self.modo, self.resultado, self.puntaje, categoria="campana")
+            if self.resultado == "victoria":
+                self.canal_resultado = reproducir_sonido("sonido_victoria")
+            elif self.resultado == "derrota":
+                self.canal_resultado = reproducir_sonido("sonido_derrota")
         elif self.modo == "vs":
             puntaje_j1 = self.puntaje_j1 or 0
             puntaje_j2 = self.puntaje_j2 or 0
             agregar_registro(self.iniciales_j1[:3], self.modo, self.resultado, puntaje_j1, categoria="vs")
             if self.iniciales_j2 != self.iniciales_j1 or puntaje_j2 != puntaje_j1:
                 agregar_registro(self.iniciales_j2[:3], self.modo, self.resultado, puntaje_j2, categoria="vs")
+            self.canal_resultado = reproducir_sonido("sonido_victoria")
+
+    def _detener_resultado(self) -> None:
+        if self.canal_resultado is not None:
+            self.canal_resultado.stop()
+            self.canal_resultado = None
 
     def manejar_escape(self):
+        self._detener_resultado()
         return "escena_menu"
 
     def actualizar(self, dt: float):
+        if self.entrada.recien_presionada(pygame.K_SPACE):
+            self._detener_resultado()
+            return "escena_menu"
         if self.entrada.recien_presionada(pygame.K_LEFT):
             self.seleccion = max(0, self.seleccion - 1)
         if self.entrada.recien_presionada(pygame.K_RIGHT):
             self.seleccion = min(1, self.seleccion + 1)
         if self.entrada.recien_presionada(pygame.K_RETURN):
+            self._detener_resultado()
             if self.seleccion == 0:
                 if self.modo == "campana":
                     dificultad_segura = self.dificultad if self.dificultad in ["facil", "medio", "dificil"] else "facil"

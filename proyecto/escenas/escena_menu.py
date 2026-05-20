@@ -6,7 +6,7 @@ import pygame
 
 from configuracion import ANCHO, ALTO, COLORES, ESTRELLAS, ESTRELLAS_POR_CAPA, FPS, PARPADEO_TITULO, TAMANO_BOTON_MENU, TAMANO_TITULO, TAMANO_SUBTITULO, VELOCIDAD_ESTRELLAS, MARGEN_GENERAL
 from matematicas.probabilidad import entero_uniforme, muestra_uniforme
-from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, dibujar_boton, dibujar_texto_ajustado
+from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, dibujar_boton, dibujar_texto_ajustado, reproducir_musica
 
 
 class EscenaMenu:
@@ -19,6 +19,7 @@ class EscenaMenu:
         self.seleccion = 0
         self.tiempo_parpadeo = 0.0
         self.estrellas = self._crear_estrellas()
+        reproducir_musica("musica_menu", 0.55)
 
     def _crear_estrellas(self) -> list[dict[str, float | int]]:
         estrellas: list[dict[str, float | int]] = []

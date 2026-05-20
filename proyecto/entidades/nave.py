@@ -16,7 +16,7 @@ from configuracion import (
     VELOCIDAD_NAVE,
 )
 from entidades.bala import Bala
-from nucleo.ayudantes import aplicar_tinte, cargar_sprite_nave
+from nucleo.ayudantes import aplicar_tinte, cargar_sprite_nave, reproducir_sonido
 
 
 class Nave:
@@ -103,6 +103,7 @@ class Nave:
         if self.ultimo_disparo > 0 or not self.esta_activa:
             return None
         self.ultimo_disparo = 0.6 if self.jugador == 1 else 0.45
+        reproducir_sonido("sonido_bala")
         salida_x = self.pos_x + TAMANO_NAVE[0] - 2
         salida_y = self.pos_y + TAMANO_NAVE[1] / 2 - 2
         return Bala(salida_x, salida_y, self.color)

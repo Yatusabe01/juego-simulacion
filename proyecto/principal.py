@@ -8,6 +8,10 @@ from nucleo.bucle_juego import BucleJuego
 def main() -> None:
     pygame.init()
     try:
+        pygame.mixer.init()
+    except pygame.error:
+        pass
+    try:
         BucleJuego().correr()
     finally:
         pygame.quit()

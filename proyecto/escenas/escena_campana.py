@@ -5,12 +5,13 @@ import math
 
 import pygame
 
-from configuracion import ALTO, ANCHO, COLORES, DIFICULTAD, PUNTOS_DESTRUIR, PUNTOS_ESQUIVAR, VIDAS_INICIALES, TAMANO_MINI_NAVE, TAMANO_SUBTITULO, TAMANO_NORMAL, TAMANO_PEQUENO, TAMANO_TITULO, ANCHO_BOTON_OPCIONES, ALTO_BOTON_OPCIONES, MARGEN_GENERAL, MARGEN_UI, ANCHO_MODAL_OPCIONES, ALTO_MODAL_OPCIONES, ALPHA_OVERLAY, SLIDER_ANCHO, SLIDER_ALTO, TAMANO_MANGO_SLIDER, ANCHO_BOTON_MODAL, ALTO_BOTON_MODAL
+from configuracion import ALTO, ANCHO, COLORES, ESTRELLAS_POR_CAPA, PUNTOS_DESTRUIR, PUNTOS_ESQUIVAR, TAMANO_SUBTITULO, TAMANO_NORMAL, TAMANO_PEQUENO, TAMANO_TITULO, ANCHO_BOTON_OPCIONES, ALTO_BOTON_OPCIONES, MARGEN_GENERAL, ANCHO_MODAL_OPCIONES, ALTO_MODAL_OPCIONES, ALPHA_OVERLAY, SLIDER_ANCHO, SLIDER_ALTO, TAMANO_MANGO_SLIDER, ANCHO_BOTON_MODAL, ALTO_BOTON_MODAL, VELOCIDAD_ESTRELLAS
 from entidades.bala import Bala
 from entidades.explosion import Explosion
 from entidades.meteorito import Meteorito
 from entidades.nave import Nave
-from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, crear_miniatura_nave, dibujar_boton_pequeno, dibujar_texto, dibujar_texto_ajustado
+from matematicas.probabilidad import entero_uniforme, muestra_uniforme
+from nucleo.ayudantes import ajustar_texto_centrado, cargar_fuente, crear_miniatura_nave, dibujar_boton_pequeno, dibujar_texto, dibujar_texto_ajustado, detener_musica, reproducir_musica, reproducir_sonido
 from nucleo.generador_oleada import GeneradorOleada
 from nucleo.manejador_colisiones import hay_colision
 from nucleo.manejador_puntaje import formatear_puntaje, sumar_por_destruccion, sumar_por_esquivar
@@ -34,6 +35,8 @@ class EscenaCampana:
         self.estado_transicion = None
         self.tiempo_transicion = 0.0
         self.duracion_transicion = 0.0
+        self.mensaje_transicion = ""
+        self.canal_victoria = None
         self.subestado_opciones = "normal"
         self.volumen = 100
         self.ignorar_escape_una_vez = False
@@ -46,6 +49,21 @@ class EscenaCampana:
         self.meteoritos_generados = 0
         self.umbral_dificultad = 10000
         self.dificultad_extra = 0
+        self.estrellas = self._crear_estrellas()
+        self.tiempo_parpadeo = 0.0
+        reproducir_musica("musica_campana", 0.55)
+
+    def _crear_estrellas(self) -> list[dict[str, float | int]]:
+        estrellas: list[dict[str, float | int]] = []
+        for indice, cantidad in enumerate(ESTRELLAS_POR_CAPA):
+            for _ in range(cantidad):
+                estrellas.append({
+                    "x": muestra_uniforme(0, ANCHO),
+                    "y": muestra_uniforme(0, ALTO),
+                    "tamano": entero_uniforme(1, 2),
+                    "velocidad": VELOCIDAD_ESTRELLAS[indice],
+                })
+        return estrellas
 
     def _inicializar_nivel(self) -> None:
         puntaje_acumulado = getattr(self, "nave", None)
@@ -122,10 +140,11 @@ class EscenaCampana:
         self.subestado_opciones = "confirmar"
         return None
 
-    def _iniciar_transicion(self, estado: str, duracion: float) -> None:
+    def _iniciar_transicion(self, estado: str, duracion: float, mensaje: str = "") -> None:
         self.estado_transicion = estado
         self.tiempo_transicion = 0.0
         self.duracion_transicion = duracion
+        self.mensaje_transicion = mensaje
         self.modo_pausa = False
         self.subestado_opciones = "normal"
 
@@ -190,12 +209,20 @@ class EscenaCampana:
 
     def actualizar(self, dt: float):
         if self.estado_transicion is not None:
+            if self.estado_transicion == "campana_completa" and self.entrada.recien_presionada(pygame.K_SPACE):
+                if self.canal_victoria is not None:
+                    self.canal_victoria.stop()
+                    self.canal_victoria = None
+                reproducir_musica("musica_campana", 0.55)
+                self.tiempo_transicion = self.duracion_transicion
             self.tiempo_transicion += dt
             if self.tiempo_transicion >= self.duracion_transicion:
                 estado = self.estado_transicion
                 self.estado_transicion = None
                 self.tiempo_transicion = 0.0
                 self.duracion_transicion = 0.0
+                mensaje = self.mensaje_transicion
+                self.mensaje_transicion = ""
                 if estado == "derrota":
                     return ("escena_fin_juego", {
                         "resultado": "derrota",
@@ -204,11 +231,21 @@ class EscenaCampana:
                         "dificultad": self.nivel_actual,
                         "iniciales": self.iniciales,
                     })
+                if estado == "campana_completa":
+                    reproducir_musica("musica_campana", 0.55)
                 self._avanzar_nivel_o_finalizar()
             return None
 
         if self.modo_pausa:
             return self._actualizar_opciones()
+
+        self.tiempo_parpadeo += dt
+        for estrella in self.estrellas:
+            estrella["x"] = float(estrella["x"]) - float(estrella["velocidad"]) * dt
+            if float(estrella["x"]) < 0:
+                estrella["x"] = ANCHO + muestra_uniforme(0, 40)
+                estrella["y"] = muestra_uniforme(0, ALTO)
+                estrella["tamano"] = entero_uniforme(1, 2)
 
         for dato in self.generador.actualizar(dt):
             self.meteoritos.append(self._crear_meteorito(dato))
@@ -244,6 +281,7 @@ class EscenaCampana:
                         # Meteorito destruido: sumar puntos y explosión
                         self.nave.puntaje += PUNTOS_DESTRUIR
                         self.explosiones.append(Explosion(meteorito.pos_x, meteorito.pos_y))
+                        reproducir_sonido("sonido_explosion")
                         self.enemigos_procesados += 1
                         self.meteoritos_generados += 1
                         self._actualizar_modo_accion()
@@ -282,11 +320,13 @@ class EscenaCampana:
             if hay_colision(self.nave.rect, meteorito.rect) and not self.nave.es_invencible:
                 self.nave.recibir_danio()
                 self.explosiones.append(Explosion(meteorito.pos_x, meteorito.pos_y))
+                reproducir_sonido("sonido_explosion")
                 self.meteoritos.remove(meteorito)
                 self.enemigos_procesados += 1
                 self.meteoritos_generados += 1
                 self._actualizar_modo_accion()
                 if self.nave.vidas <= 0:
+                    reproducir_sonido("sonido_derrota")
                     self._iniciar_transicion("derrota", 1.35)
                     return None
 
@@ -294,14 +334,20 @@ class EscenaCampana:
         self._actualizar_dificultad_por_puntaje()
         if not self.modo_infinito and self.meteoritos_generados >= self.objetivo_nivel:
             if self.indice_nivel >= len(self.niveles) - 1:
-                self._iniciar_transicion("campana_completa", 2.1)
+                detener_musica()
+                self.canal_victoria = reproducir_sonido("sonido_victoria")
+                self._iniciar_transicion("campana_completa", 12.0, f"FELICIDADES {self.iniciales}")
             else:
-                self._iniciar_transicion("nivel_completado", 0.9)
+                self._iniciar_transicion("nivel_completado", 0.9, "NIVEL COMPLETADO")
             return None
         return None
 
     def renderizar(self, pantalla: pygame.Surface) -> None:
         pantalla.fill(COLORES["fondo"])
+        for estrella in self.estrellas:
+            tamano = int(estrella["tamano"])
+            brillo = COLORES["blanco"] if tamano == 2 else COLORES["neutro_claro"]
+            pygame.draw.rect(pantalla, brillo, pygame.Rect(int(estrella["x"]), int(estrella["y"]), tamano, tamano))
         for meteorito in self.meteoritos:
             meteorito.renderizar(pantalla)
         for bala in self.balas:
@@ -347,15 +393,17 @@ class EscenaCampana:
             elif self.estado_transicion == "campana_completa":
                 ajuste_y = -8
                 color = COLORES["acento"]
-                mensaje = f"FELICIDADES {self.iniciales}"
+                mensaje = self.mensaje_transicion or f"FELICIDADES {self.iniciales}"
                 submensaje = "PASASTE EL MODO CAMPANA"
             else:
                 ajuste_y = 0
                 color = COLORES["primario"]
-                mensaje = "NIVEL COMPLETADO"
+                mensaje = self.mensaje_transicion or "NIVEL COMPLETADO"
                 submensaje = "PREPARANDO SIGUIENTE NIVEL"
             ajustar_texto_centrado(pantalla, mensaje, self.fuente_titulo, color, ANCHO // 2, ALTO // 2 - 18 + ajuste_y)
             ajustar_texto_centrado(pantalla, submensaje, self.fuente_subtitulo, COLORES["blanco"], ANCHO // 2, ALTO // 2 + 24 + ajuste_y)
+            if self.estado_transicion == "campana_completa":
+                dibujar_texto_ajustado(pantalla, "ESPACIO PARA OMITIR", 10, COLORES["neutro_medio"], (ANCHO // 2, ALTO // 2 + 62), ANCHO - 120)
 
         if self.modo_pausa:
             overlay = pygame.Surface((ANCHO, ALTO), pygame.SRCALPHA)

@@ -1,0 +1,27 @@
+Pon estos archivos en `assets/audio/`:
+
+- `musica_menu.ogg` o `musica_menu.mp3` en loop infinito
+-. `musica_campana.ogg` o `musica_campana.mp3` en loop infinito
+- `musica_vs.ogg` o `musica_vs.mp3` en loop infinito
+-. `sonido_bala.wav` o `sonido_bala.ogg`
+- `sonido_explosion.wav` o `sonido_explosion.ogg`
+- `sonido_victoria.wav` o `sonido_victoria.ogg`
+- `sonido_derrota.wav` o `sonido_derrota.ogg`
+- `sonido_dificultad.wav` o `sonido_dificultad.ogg`
+
+Qué debe hacer cada uno:
+
+- `musica_menu`: sonar al entrar al menú y repetirse siempre.
+- `musica_campana`: sonar durante campaña, repetir en loop.
+- `musica_vs`: sonar durante VS, repetir en loop.
+- `sonido_bala`: sonar cada vez que disparas.
+- `sonido_explosion`: sonar cuando destruyes un meteorito.
+- `sonido_victoria`: sonar cuando ganas una partida o terminas campaña.
+- `sonido_derrota`: sonar cuando pierdes.
+- `sonido_dificultad`: sonar cada vez que sube la dificultad en infinito.
+
+Notas:
+
+- Los archivos deben estar en formato reproducible por `pygame`.
+- Para música de fondo conviene `ogg` por loop más estable.
+- Para efectos cortos conviene `wav` u `ogg` corto.

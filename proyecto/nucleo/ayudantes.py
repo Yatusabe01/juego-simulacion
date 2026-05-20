@@ -13,6 +13,10 @@ from configuracion import (
     RUTA_SPRITE_NAVE,
 )
 
+RUTA_AUDIO = os.path.join(os.path.dirname(RUTA_SPRITE_NAVE), "audio")
+_SONIDOS: dict[str, pygame.mixer.Sound] = {}
+_MUSICA_ACTUAL = None
+
 
 def cargar_fuente(tamano: int) -> pygame.font.Font:
     """Carga la fuente retro o una monoespaciada por defecto."""
@@ -42,6 +46,65 @@ def cargar_sprite_nave() -> pygame.Surface:
         imagen = pygame.image.load(RUTA_SPRITE_NAVE).convert_alpha()
         return pygame.transform.smoothscale(imagen, (64, 32))
     return _crear_nave_base()
+
+
+def _ruta_audio(nombre_base: str) -> str | None:
+    for extension in (".ogg", ".mp3", ".wav"):
+        ruta = os.path.join(RUTA_AUDIO, f"{nombre_base}{extension}")
+        if os.path.exists(ruta):
+            return ruta
+    return None
+
+
+def cargar_sonido(nombre_base: str) -> pygame.mixer.Sound | None:
+    if not pygame.mixer.get_init():
+        return None
+    sonido = _SONIDOS.get(nombre_base)
+    if sonido is not None:
+        return sonido
+    ruta = _ruta_audio(nombre_base)
+    if ruta is None:
+        return None
+    try:
+        sonido = pygame.mixer.Sound(ruta)
+    except pygame.error:
+        return None
+    _SONIDOS[nombre_base] = sonido
+    return sonido
+
+
+def reproducir_sonido(nombre_base: str) -> None:
+    sonido = cargar_sonido(nombre_base)
+    if sonido is not None:
+        if nombre_base == "sonido_bala":
+            sonido.set_volume(0.35)
+        else:
+            sonido.set_volume(1.0)
+        return sonido.play()
+
+
+def reproducir_musica(nombre_base: str, volumen: float = 0.7) -> None:
+    global _MUSICA_ACTUAL
+    if not pygame.mixer.get_init():
+        return
+    ruta = _ruta_audio(nombre_base)
+    if ruta is None or _MUSICA_ACTUAL == ruta:
+        return
+    try:
+        pygame.mixer.music.stop()
+        pygame.mixer.music.load(ruta)
+        pygame.mixer.music.set_volume(volumen)
+        pygame.mixer.music.play(-1)
+        _MUSICA_ACTUAL = ruta
+    except pygame.error:
+        return
+
+
+def detener_musica() -> None:
+    global _MUSICA_ACTUAL
+    if pygame.mixer.get_init() is not None:
+        pygame.mixer.music.stop()
+    _MUSICA_ACTUAL = None
 
 
 def aplicar_tinte(superficie: pygame.Surface, color: tuple[int, int, int]) -> pygame.Surface:
