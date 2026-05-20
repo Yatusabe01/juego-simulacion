@@ -1,0 +1,50 @@
+[
+  {
+    "iniciales": "IVT",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 180,
+    "fecha": "2026-05-19 18:53"
+  },
+  {
+    "iniciales": "IVT",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 125,
+    "fecha": "2026-05-19 18:52"
+  },
+  {
+    "iniciales": "IVT",
+    "modo": "campana",
+    "categoria": "campana",
+    "resultado": "derrota",
+    "puntaje": 45,
+    "fecha": "2026-05-19 19:34"
+  },
+  {
+    "iniciales": "CAR",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "victoria_j2",
+    "puntaje": 20,
+    "fecha": "2026-05-19 18:43"
+  },
+  {
+    "iniciales": "IVT",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "victoria_j2",
+    "puntaje": 20,
+    "fecha": "2026-05-19 18:43"
+  },
+  {
+    "iniciales": "IVT",
+    "modo": "vs",
+    "categoria": "vs",
+    "resultado": "victoria_j1",
+    "puntaje": 15,
+    "fecha": "2026-05-19 19:02"
+  }
+]
