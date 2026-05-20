@@ -224,7 +224,13 @@ class EscenaVs:
         self.balas_j2, self.meteoritos_j2, self.explosiones_j2, _ = self._resolver_colisiones(self.nave_j2, self.balas_j2, self.meteoritos_j2, self.explosiones_j2)
 
         if not self.nave_j1.esta_activa and not self.nave_j2.esta_activa:
-            return ("escena_fin_juego", {"resultado": "empate", "puntaje_j1": self.nave_j1.puntaje, "puntaje_j2": self.nave_j2.puntaje, "modo": "vs", "iniciales_j1": self.iniciales_j1, "iniciales_j2": self.iniciales_j2})
+            if self.nave_j1.puntaje > self.nave_j2.puntaje:
+                resultado = "victoria_j1"
+            elif self.nave_j2.puntaje > self.nave_j1.puntaje:
+                resultado = "victoria_j2"
+            else:
+                resultado = "empate"
+            return ("escena_fin_juego", {"resultado": resultado, "puntaje_j1": self.nave_j1.puntaje, "puntaje_j2": self.nave_j2.puntaje, "modo": "vs", "iniciales_j1": self.iniciales_j1, "iniciales_j2": self.iniciales_j2})
         return None
 
     def _dibujar_mundo(self, vista: pygame.Surface, desplazamiento_y: int, nave: Nave, balas: list[Bala], meteoritos: list[Meteorito], explosiones: list[Explosion], etiqueta: str, color_nave: tuple[int, int, int]) -> None:

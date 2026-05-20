@@ -49,10 +49,9 @@ class EscenaIniciales:
                         iniciales_unidas = {self.iniciales[0].upper(), self.iniciales[1].upper()}
                         if self.modo == "vs_imposible":
                             datos["modo_vs"] = "imposible"
-                            datos["invencible_j1"] = False
-                            datos["invencible_j2"] = False
-                        elif self.modo.startswith("vs") and ("SIM" in iniciales_unidas or "ELF" in iniciales_unidas):
-                            datos["modo_vs"] = "imposible"
+                        if self.modo.startswith("vs"):
+                            if "SIM" in iniciales_unidas or "ELF" in iniciales_unidas:
+                                datos["modo_vs"] = "imposible"
                             datos["invencible_j1"] = self.iniciales[0].upper() in {"SIM", "ELF"}
                             datos["invencible_j2"] = self.iniciales[1].upper() in {"SIM", "ELF"}
                         if self.modo == "campana":
@@ -60,7 +59,13 @@ class EscenaIniciales:
                         if self.modo == "vs_infinito":
                             return ("escena_vs", {"iniciales_j1": self.iniciales[0], "iniciales_j2": self.iniciales[1], "modo_vs": "infinito"})
                         if self.modo == "vs_imposible":
-                            return ("escena_vs", {"iniciales_j1": self.iniciales[0], "iniciales_j2": self.iniciales[1], "modo_vs": "imposible"})
+                            return ("escena_vs", {
+                                "iniciales_j1": self.iniciales[0],
+                                "iniciales_j2": self.iniciales[1],
+                                "modo_vs": "imposible",
+                                "invencible_j1": datos.get("invencible_j1", False),
+                                "invencible_j2": datos.get("invencible_j2", False),
+                            })
                         return ("escena_vs", datos)
             else:
                 letra = evento.unicode.upper()

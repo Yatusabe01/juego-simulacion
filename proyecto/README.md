@@ -40,6 +40,14 @@ Juego arcade en `pygame` donde una nave esquiva y destruye meteoritos.
 - `pygame.Rect`: se usa para colisiones, botones y layout.
 - `pygame.mixer`: se usa para música en loop y efectos por evento.
 
+## Medidas
+
+- Las medidas de la interfaz están en píxeles (`px`).
+- Ejemplo: `60` significa `60 px` en posición, ancho o alto, según el contexto.
+- Los tamaños de texto usan valores relativos al cargador de fuente, pero también se dibujan en pantalla como píxeles.
+- `pygame.Rect(x, y, ancho, alto)` usa siempre coordenadas y tamaños en píxeles.
+- Los valores como `dt` son de tiempo en segundos, no en píxeles.
+
 ## Uso
 
 - `WASD` o flechas: mover nave.
