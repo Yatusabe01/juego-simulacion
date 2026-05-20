@@ -102,7 +102,7 @@ class Nave:
     def disparar(self) -> Bala | None:
         if self.ultimo_disparo > 0 or not self.esta_activa:
             return None
-        self.ultimo_disparo = 0.6 if self.jugador == 1 else 0.45
+        self.ultimo_disparo = 0.4 if self.jugador == 1 else 0.35
         reproducir_sonido("sonido_bala")
         salida_x = self.pos_x + TAMANO_NAVE[0] - 2
         salida_y = self.pos_y + TAMANO_NAVE[1] / 2 - 2
